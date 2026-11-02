@@ -21,8 +21,8 @@ func set_border_size(value: Vector3i) -> void:
 	if Engine.is_editor_hint():
 		create_border()
 
-@export var start: Vector2i = Vector2i(0, 0) : set = set_start
-func set_start(value: Vector2i) -> void:
+@export var start: Vector3i = Vector3i(5, 5, 5) : set = set_start
+func set_start(value: Vector3i) -> void:
 	start = value
 	if start.x < 0:
 		start.x = 0
@@ -33,13 +33,17 @@ func set_start(value: Vector2i) -> void:
 	if start.y > border_size.y:
 		start.y = border_size.y - 1
 
-@export var path_length: int = 1 : set = set_length
+@export var path_length: int = 90 : set = set_length
 func set_length(value: int) -> void:
 	path_length = value
 	if path_length < 1:
 		path_length = 1
 	if path_length > border_size.x * border_size.y - 2:
 		path_length = border_size.x * border_size.y - 2
+
+var directions: Array = [
+	Vector3i.BACK, Vector3i.DOWN, Vector3i.FORWARD, Vector3i.LEFT, Vector3i.RIGHT, Vector3i.UP
+]
 
 func create_border() -> void:
 	grid_map.clear()
@@ -63,14 +67,14 @@ func create_border() -> void:
 	#z border
 	for i in range(0, border_size.z + 1):
 		grid_map.set_cell_item(Vector3i(-1, i, -1), 3)
-		grid_map.set_cell_item(Vector3i(border_size.x, i, 0), 3)
+		grid_map.set_cell_item(Vector3i(border_size.x, i, -1), 3)
 		
 		grid_map.set_cell_item(Vector3i(-1, i, border_size.y), 3)
 		grid_map.set_cell_item(Vector3i(border_size.x, i, border_size.y), 3)
 
 func generate_dungeon() -> void:
 	create_border()
-	grid_map.set_cell_item(Vector3i(start.x, 0, start.y), 1)
+	grid_map.set_cell_item(start, 1)
 	
 	if generate_dungeon_path(path_length, start):
 		print("Created Dungeon!")
@@ -78,37 +82,28 @@ func generate_dungeon() -> void:
 		print("Failed to Create Dungeon!!!")
 
 
-func generate_dungeon_path(length: int, start_pos: Vector2i) -> bool:
+func generate_dungeon_path(length: int, start_pos: Vector3i) -> bool:
 	if length == 0:
 		return true
 	
-	var curr_pos: Vector2i = start_pos
-	var dir: Vector2i
+	var curr_pos: Vector3i = start_pos
 	
-	match randi_range(0, 3):
-		0:
-			dir = Vector2i.LEFT
-		1:
-			dir = Vector2i.UP
-		2:
-			dir = Vector2i.DOWN
-		3:
-			dir = Vector2i.RIGHT
+	directions.shuffle()
 	
-	for i in 4:
+	for dir in directions:
 		if (curr_pos.x + dir.x >= 0 and curr_pos.x + dir.x < border_size.x and
-			curr_pos.y + dir.y >= 0 and curr_pos.y + dir.y < border_size.y):
-			if grid_map.get_cell_item(Vector3i(curr_pos.x + dir.x, 0, curr_pos.y + dir.y)) == -1:
+			curr_pos.y + dir.y >= 0 and curr_pos.y + dir.y < border_size.y and 
+			curr_pos.z + dir.z >= 0 and curr_pos.z + dir.z < border_size.z):
+			if grid_map.get_cell_item(Vector3i(curr_pos.x + dir.x, curr_pos.z + dir.z, curr_pos.y + dir.y)) == -1:
 				curr_pos += dir
 				if length != 1:
-					grid_map.set_cell_item(Vector3i(curr_pos.x, 0, curr_pos.y), 0)
+					grid_map.set_cell_item(curr_pos, 0)
 				else:
-					grid_map.set_cell_item(Vector3i(curr_pos.x, 0, curr_pos.y), 2)
+					grid_map.set_cell_item(curr_pos, 2)
 				if generate_dungeon_path(length - 1, curr_pos):
 					return true
 				else:
-					grid_map.set_cell_item(Vector3i(curr_pos.x, 0, curr_pos.y), -1)
+					grid_map.set_cell_item(curr_pos, -1)
 					curr_pos -= dir
-		dir = Vector2i(dir.y, -dir.x)
 	
 	return false
