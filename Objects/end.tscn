@@ -1,0 +1,80 @@
+[gd_scene format=3 uid="uid://coctf0yk3yh1s"]
+
+[ext_resource type="Script" uid="uid://du3rimf6uc7k5" path="res://Scripts/Rooms/end.gd" id="1_fftqo"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xrkx2"]
+cull_mode = 2
+albedo_color = Color(1, 0, 0, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_fftqo"]
+material = SubResource("StandardMaterial3D_xrkx2")
+flip_faces = true
+orientation = 1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1s7vr"]
+cull_mode = 2
+albedo_color = Color(1, 0, 0, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_jcign"]
+material = SubResource("StandardMaterial3D_1s7vr")
+orientation = 1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_j0o1m"]
+cull_mode = 2
+albedo_color = Color(1, 0, 0, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_hdnfe"]
+material = SubResource("StandardMaterial3D_j0o1m")
+orientation = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lvrag"]
+cull_mode = 2
+albedo_color = Color(1, 0, 0, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_ix6wa"]
+material = SubResource("StandardMaterial3D_lvrag")
+flip_faces = true
+orientation = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tu1ar"]
+cull_mode = 2
+albedo_color = Color(1, 0, 0, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_b7jvo"]
+material = SubResource("StandardMaterial3D_tu1ar")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_w87d1"]
+cull_mode = 2
+albedo_color = Color(1, 0, 0, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_k72ce"]
+material = SubResource("StandardMaterial3D_w87d1")
+flip_faces = true
+
+[node name="End" type="Node3D" unique_id=1462555289 node_paths=PackedStringArray("walls")]
+script = ExtResource("1_fftqo")
+walls = [NodePath("Room_Wall1"), NodePath("Room_Wall2"), NodePath("Room_Wall3"), NodePath("Room_Wall4")]
+
+[node name="Room_Ceiling" type="MeshInstance3D" parent="." unique_id=447253767]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.49995404, 1, 0.49854732)
+mesh = SubResource("QuadMesh_fftqo")
+
+[node name="Room_Floor" type="MeshInstance3D" parent="." unique_id=877838308]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.49995404, 0, 0.49854732)
+mesh = SubResource("QuadMesh_jcign")
+
+[node name="Room_Wall1" type="MeshInstance3D" parent="." unique_id=1181141300]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.595518e-05, 0.5, 0.49854732)
+mesh = SubResource("QuadMesh_hdnfe")
+
+[node name="Room_Wall2" type="MeshInstance3D" parent="." unique_id=1388979113]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.99995404, 0.5, 0.49854732)
+mesh = SubResource("QuadMesh_ix6wa")
+
+[node name="Room_Wall3" type="MeshInstance3D" parent="." unique_id=1730265998]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.49995404, 0.5, -0.0014526844)
+mesh = SubResource("QuadMesh_b7jvo")
+
+[node name="Room_Wall4" type="MeshInstance3D" parent="." unique_id=731250931]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.49995404, 0.5, 0.9985473)
+mesh = SubResource("QuadMesh_k72ce")

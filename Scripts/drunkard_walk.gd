@@ -4,6 +4,13 @@ extends Node3D
 @onready var grid_map: GridMap = $GridMap
 
 var dungeon: Array
+var past_pos: Dictionary [Vector3i, Node3D]
+
+const norm_room = preload("res://Objects/room.tscn")
+const spawn_room = preload("res://Objects/spawn.tscn")
+const end_room = preload("res://Objects/end.tscn")
+
+@onready var container: Node3D = $Container
 
 @export var generate : bool = false : set = set_generate
 func set_generate(_value: bool) -> void:
@@ -47,6 +54,10 @@ var directions: Array = [
 
 func create_border() -> void:
 	grid_map.clear()
+	past_pos.clear()
+	
+	for child in container.get_children():
+		child.queue_free()
 	
 	# x border
 	for i in range(-1, border_size.x + 1):
@@ -74,10 +85,12 @@ func create_border() -> void:
 
 func generate_dungeon() -> void:
 	create_border()
-	grid_map.set_cell_item(start, 1)
+	spawn_object(start, 1)
 	
 	if generate_dungeon_path(path_length, start):
 		print("Created Dungeon!")
+		for child in container.get_children():
+			child.remove_walls(past_pos)
 	else:
 		print("Failed to Create Dungeon!!!")
 
@@ -92,18 +105,40 @@ func generate_dungeon_path(length: int, start_pos: Vector3i) -> bool:
 	
 	for dir in directions:
 		if (curr_pos.x + dir.x >= 0 and curr_pos.x + dir.x < border_size.x and
-			curr_pos.y + dir.y >= 0 and curr_pos.y + dir.y < border_size.y and 
-			curr_pos.z + dir.z >= 0 and curr_pos.z + dir.z < border_size.z):
-			if grid_map.get_cell_item(Vector3i(curr_pos.x + dir.x, curr_pos.z + dir.z, curr_pos.y + dir.y)) == -1:
+			curr_pos.y + dir.y >= 0 and curr_pos.y + dir.y < border_size.z and 
+			curr_pos.z + dir.z >= 0 and curr_pos.z + dir.z < border_size.y):
+			#if grid_map.get_cell_item(Vector3i(curr_pos.x + dir.x, curr_pos.z + dir.z, curr_pos.y + dir.y)) == -1:
+			if !past_pos.has(curr_pos + dir):
 				curr_pos += dir
 				if length != 1:
-					grid_map.set_cell_item(curr_pos, 0)
+					#grid_map.set_cell_item(curr_pos, 0)
+					spawn_object(curr_pos, 0)
 				else:
-					grid_map.set_cell_item(curr_pos, 2)
+					#grid_map.set_cell_item(curr_pos, 2)
+					spawn_object(curr_pos, 2)
 				if generate_dungeon_path(length - 1, curr_pos):
 					return true
 				else:
-					grid_map.set_cell_item(curr_pos, -1)
+					#grid_map.set_cell_item(curr_pos, -1)
+					past_pos.erase(curr_pos)
 					curr_pos -= dir
 	
 	return false
+
+
+func spawn_object(pos: Vector3, room: int):
+	var new_obj
+	
+	match room:
+		0:
+			new_obj = norm_room.instantiate()
+		1:
+			new_obj = spawn_room.instantiate()
+		2:
+			new_obj = end_room.instantiate()
+	
+	container.add_child(new_obj)
+	
+	new_obj.global_position = pos
+	
+	past_pos.set(pos, new_obj)

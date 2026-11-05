@@ -1,6 +1,9 @@
 [gd_scene format=3 uid="uid://du4eq83xniayt"]
 
+[ext_resource type="PackedScene" uid="uid://cg43voh6pqqo0" path="res://Objects/room.tscn" id="1_s2k12"]
+
 [sub_resource type="BoxMesh" id="BoxMesh_ra2i3"]
+flip_faces = true
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_x6xot"]
 
@@ -34,3 +37,6 @@ surface_material_override/0 = SubResource("StandardMaterial3D_g4gaj")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5.37739)
 mesh = SubResource("BoxMesh_ra2i3")
 surface_material_override/0 = SubResource("StandardMaterial3D_3yjim")
+
+[node name="Room" parent="." unique_id=669720818 instance=ExtResource("1_s2k12")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 7.183556)

@@ -4,6 +4,7 @@
 
 [sub_resource type="BoxMesh" id="BoxMesh_sfdft"]
 material = SubResource("StandardMaterial3D_x6xot")
+flip_faces = true
 
 [sub_resource type="Image" id="Image_sfdft"]
 data = {
@@ -22,6 +23,7 @@ albedo_color = Color(0.16470589, 1, 0, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_ol7up"]
 material = SubResource("StandardMaterial3D_s2k12")
+flip_faces = true
 
 [sub_resource type="Image" id="Image_x5wy8"]
 data = {
@@ -40,6 +42,7 @@ albedo_color = Color(1, 0.08235294, 0, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_sqws4"]
 material = SubResource("StandardMaterial3D_g4gaj")
+flip_faces = true
 
 [sub_resource type="Image" id="Image_8a5pa"]
 data = {
