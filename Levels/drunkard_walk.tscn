@@ -6,7 +6,7 @@
 [node name="DrunkardWalk" type="Node3D" unique_id=29187310]
 script = ExtResource("1_nuh06")
 border_size = Vector3i(16, 16, 17)
-path_length = 150
+path_length = 254
 
 [node name="GridMap" type="GridMap" parent="." unique_id=657117888]
 mesh_library = ExtResource("1_otsw8")

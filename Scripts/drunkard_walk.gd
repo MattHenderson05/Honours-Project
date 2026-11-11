@@ -9,6 +9,7 @@ var past_pos: Dictionary [Vector3i, Node3D]
 const norm_room = preload("res://Objects/room.tscn")
 const spawn_room = preload("res://Objects/spawn.tscn")
 const end_room = preload("res://Objects/end.tscn")
+const stair_room = preload("res://Objects/stairs.tscn")
 
 @onready var container: Node3D = $Container
 
