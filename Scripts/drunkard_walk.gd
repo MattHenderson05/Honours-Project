@@ -94,6 +94,12 @@ func generate_dungeon() -> void:
 			child.remove_walls(past_pos)
 	else:
 		print("Failed to Create Dungeon!!!")
+	
+	spawn_object(Vector3(-6, -5, -5), 0)
+	#spawn_object(Vector3(-5, -5, -5), 3) #0 right
+	#spawn_object(Vector3(-6, -5, -5), 3) #90 forward
+	spawn_object(Vector3(-6, -5, -4), 3) #180 left
+	#spawn_object(Vector3(-5, -5, -4), 3) #270 back
 
 
 func generate_dungeon_path(length: int, start_pos: Vector3i) -> bool:
@@ -137,6 +143,9 @@ func spawn_object(pos: Vector3, room: int):
 			new_obj = spawn_room.instantiate()
 		2:
 			new_obj = end_room.instantiate()
+		3: 
+			new_obj = stair_room.instantiate()
+			new_obj.rotation.y += deg_to_rad(180)
 	
 	container.add_child(new_obj)
 	
