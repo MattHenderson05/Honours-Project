@@ -53,6 +53,9 @@ var directions: Array = [
 	Vector3i.BACK, Vector3i.DOWN, Vector3i.FORWARD, Vector3i.LEFT, Vector3i.RIGHT, Vector3i.UP
 ]
 
+func _ready() -> void:
+	generate_dungeon()
+
 func create_border() -> void:
 	grid_map.clear()
 	past_pos.clear()
@@ -88,7 +91,8 @@ func generate_dungeon() -> void:
 	create_border()
 	spawn_object(start, 1, Vector3i.ZERO)
 	
-	if generate_dungeon_path(path_length, start, Vector3i.ZERO):
+	var f = await generate_dungeon_path(path_length, start, Vector3i.ZERO)
+	if f.value:
 		print("Created Dungeon!")
 		for child in container.get_children():
 			child.remove_walls(past_pos)
@@ -96,11 +100,11 @@ func generate_dungeon() -> void:
 		print("Failed to Create Dungeon!!!")
 	
 	#spawn_object(Vector3(-6, -5, -5), 0, Vector3i.ZERO)
-	#spawn_object(Vector3(-6, -5, -4), 0, Vector3i.ZERO)
-	#spawn_object(Vector3(-4, -4, -5), 3, Vector3i.RIGHT) #0 right
-	#spawn_object(Vector3(-6, -4, -7), 3, Vector3i.FORWARD) #90 forward
-	#spawn_object(Vector3(-8, -4, -5), 3, Vector3i.LEFT) #180 left
-	#spawn_object(Vector3(-6, -4, -3), 3, Vector3i.BACK) #270 back
+	#spawn_object(Vector3(-5, -5, -5), 0, Vector3i.ZERO)
+	#spawn_object(Vector3(-4, -6, -5), 4, Vector3i.RIGHT) #0 right
+	#spawn_object(Vector3(-6, -6, -7), 4, Vector3i.FORWARD) #90 forward
+	#spawn_object(Vector3(-8, -6, -5), 4, Vector3i.LEFT) #180 left
+	#spawn_object(Vector3(-6, -6, -3), 4, Vector3i.BACK) #270 back
 	
 	#for child in container.get_children():
 			#child.remove_walls(past_pos)
@@ -113,6 +117,8 @@ func generate_dungeon_path(length: int, start_pos: Vector3i, prev_dir: Vector3i)
 	if length == 0:
 		return true
 	var curr_pos: Vector3i = start_pos
+	
+	await get_tree().create_timer(1.0).timeout
 	
 	directions.shuffle()
 	
@@ -128,18 +134,26 @@ func generate_dungeon_path(length: int, start_pos: Vector3i, prev_dir: Vector3i)
 					#grid_map.set_cell_item(curr_pos, 0)
 					if dir == Vector3i.UP:
 						#print("up")
-						if past_pos.has(curr_pos + prev_dir) and !check_inside_boundary(curr_pos + prev_dir):
+						if past_pos.has(curr_pos + prev_dir) or !check_inside_boundary(curr_pos + prev_dir) or length == path_length or length == 1:
 							#print("Skipped because no room")
 							continue
 						curr_pos += prev_dir
 						spawn_object(curr_pos, 3, prev_dir)
+					elif dir == Vector3i.UP:
+						#print("down")
+						if past_pos.has(curr_pos + prev_dir) or !check_inside_boundary(curr_pos + prev_dir) or length == path_length or length == 1:
+							#print("Skipped because no room")
+							continue
+						curr_pos += prev_dir
+						spawn_object(curr_pos, 4, prev_dir)
 					else:
 						spawn_object(curr_pos, 0, prev_dir)
 				else:
 					#if dir != Vector3i.UP and dir != Vector3i.DOWN:
 					#grid_map.set_cell_item(curr_pos, 2)
 					spawn_object(curr_pos, 2, prev_dir)
-				if generate_dungeon_path(length - 1, curr_pos, dir):
+				var f = await generate_dungeon_path(length - 1, curr_pos, dir)
+				if f.value:
 					return true
 				else:
 					#grid_map.set_cell_item(curr_pos, -1)
@@ -158,10 +172,17 @@ func generate_dungeon_path(length: int, start_pos: Vector3i, prev_dir: Vector3i)
 						past_pos.erase(curr_pos)
 						spawn_object(curr_pos, 0, prev_dir)
 					elif dir == Vector3i.DOWN:
+						#print("destroyed")
 						node_removal = past_pos[curr_pos]
 						past_pos.erase(curr_pos)
-						curr_pos -= dir
 						node_removal.queue_free()
+						curr_pos -= prev_dir
+						node_removal = past_pos[curr_pos]
+						past_pos.erase(curr_pos)
+						node_removal.queue_free()
+						curr_pos -= dir
+						past_pos.erase(curr_pos)
+						spawn_object(curr_pos, 0, prev_dir)
 					else:
 						node_removal = past_pos[curr_pos]
 						past_pos.erase(curr_pos)
@@ -204,6 +225,29 @@ func spawn_object(pos: Vector3i, room: int, prev_dir: Vector3i):
 				Vector3i.BACK:
 					stair_obj.global_position = pos - prev_dir - Vector3i.UP - Vector3i.LEFT
 					stair_obj.rotation.y += deg_to_rad(270)
+			
+			new_obj = norm_room.instantiate()
+		4:
+			node_removal = past_pos[pos - prev_dir - Vector3i.DOWN]
+			node_removal.queue_free()
+			
+			stair_obj = stair_room.instantiate()
+			past_pos.set((pos - prev_dir - Vector3i.DOWN), stair_obj)
+			past_pos.set((pos - prev_dir), stair_obj)
+			container.add_child(stair_obj)
+			
+			match prev_dir:
+				Vector3i.RIGHT:
+					stair_obj.global_position = pos - Vector3i.FORWARD
+					stair_obj.rotation.y += deg_to_rad(180)
+				Vector3i.FORWARD:
+					stair_obj.global_position = pos - prev_dir - Vector3i.LEFT
+					stair_obj.rotation.y += deg_to_rad(270)
+				Vector3i.LEFT:
+					stair_obj.global_position = pos - prev_dir
+				Vector3i.BACK:
+					stair_obj.global_position = pos
+					stair_obj.rotation.y += deg_to_rad(90)
 			
 			new_obj = norm_room.instantiate()
 	
