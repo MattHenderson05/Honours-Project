@@ -91,8 +91,8 @@ func generate_dungeon() -> void:
 	create_border()
 	spawn_object(start, 1, Vector3i.ZERO)
 	
-	var f = await generate_dungeon_path(path_length, start, Vector3i.ZERO)
-	if f.value:
+	#var f = await generate_dungeon_path(path_length, start, Vector3i.ZERO)
+	if generate_dungeon_path(path_length, start, Vector3i.ZERO):
 		print("Created Dungeon!")
 		for child in container.get_children():
 			child.remove_walls(past_pos)
@@ -118,7 +118,7 @@ func generate_dungeon_path(length: int, start_pos: Vector3i, prev_dir: Vector3i)
 		return true
 	var curr_pos: Vector3i = start_pos
 	
-	await get_tree().create_timer(1.0).timeout
+	#await get_tree().create_timer(0.5).timeout
 	
 	directions.shuffle()
 	
@@ -139,8 +139,7 @@ func generate_dungeon_path(length: int, start_pos: Vector3i, prev_dir: Vector3i)
 							continue
 						curr_pos += prev_dir
 						spawn_object(curr_pos, 3, prev_dir)
-					elif dir == Vector3i.UP:
-						#print("down")
+					elif dir == Vector3i.DOWN:
 						if past_pos.has(curr_pos + prev_dir) or !check_inside_boundary(curr_pos + prev_dir) or length == path_length or length == 1:
 							#print("Skipped because no room")
 							continue
@@ -152,15 +151,15 @@ func generate_dungeon_path(length: int, start_pos: Vector3i, prev_dir: Vector3i)
 					#if dir != Vector3i.UP and dir != Vector3i.DOWN:
 					#grid_map.set_cell_item(curr_pos, 2)
 					spawn_object(curr_pos, 2, prev_dir)
-				var f = await generate_dungeon_path(length - 1, curr_pos, dir)
-				if f.value:
+				#var f = await generate_dungeon_path(length - 1, curr_pos, dir)
+				if generate_dungeon_path(length - 1, curr_pos, dir):
 					return true
 				else:
 					#grid_map.set_cell_item(curr_pos, -1)
 					var node_removal: Node3D 
 					
 					if dir == Vector3i.UP:
-						#print("destroyed")
+						#print("destroyed old up")
 						node_removal = past_pos[curr_pos]
 						past_pos.erase(curr_pos)
 						node_removal.queue_free()
@@ -172,7 +171,7 @@ func generate_dungeon_path(length: int, start_pos: Vector3i, prev_dir: Vector3i)
 						past_pos.erase(curr_pos)
 						spawn_object(curr_pos, 0, prev_dir)
 					elif dir == Vector3i.DOWN:
-						#print("destroyed")
+						#print("destroyed old down")
 						node_removal = past_pos[curr_pos]
 						past_pos.erase(curr_pos)
 						node_removal.queue_free()
