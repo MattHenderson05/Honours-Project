@@ -134,14 +134,14 @@ func generate_dungeon_path(length: int, start_pos: Vector3i, prev_dir: Vector3i)
 					#grid_map.set_cell_item(curr_pos, 0)
 					if dir == Vector3i.UP:
 						#print("up")
-						if past_pos.has(curr_pos + prev_dir) or !check_inside_boundary(curr_pos + prev_dir) or length == path_length or length == 1 or length == 2:
+						if past_pos.has(curr_pos + prev_dir) or !check_inside_boundary(curr_pos + prev_dir) or length == path_length or length == 2:
 							#print("Skipped up because no room")
 							curr_pos -= dir
 							continue
 						curr_pos += prev_dir
 						spawn_object(curr_pos, 3, prev_dir)
 					elif dir == Vector3i.DOWN:
-						if past_pos.has(curr_pos + prev_dir) or !check_inside_boundary(curr_pos + prev_dir) or length == path_length or length == 1 or length == 2:
+						if past_pos.has(curr_pos + prev_dir) or !check_inside_boundary(curr_pos + prev_dir) or length == path_length or length == 2:
 							#print("Skipped down because no room")
 							curr_pos -= dir
 							continue
@@ -152,6 +152,9 @@ func generate_dungeon_path(length: int, start_pos: Vector3i, prev_dir: Vector3i)
 				else:
 					#if dir != Vector3i.UP and dir != Vector3i.DOWN:
 					#grid_map.set_cell_item(curr_pos, 2)
+					if dir ==  Vector3i.UP or dir ==  Vector3i.DOWN:
+						curr_pos -= dir
+						continue
 					spawn_object(curr_pos, 2, prev_dir)
 				var f = await generate_dungeon_path(length - 1, curr_pos, dir)
 				if f:
