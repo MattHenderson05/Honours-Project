@@ -91,8 +91,8 @@ func generate_dungeon() -> void:
 	create_border()
 	spawn_object(start, 1, Vector3i.ZERO)
 	
-	#var f = await generate_dungeon_path(path_length, start, Vector3i.ZERO)
-	if generate_dungeon_path(path_length, start, Vector3i.ZERO):
+	var f = await generate_dungeon_path(path_length, start, Vector3i.ZERO)
+	if f:
 		print("Created Dungeon!")
 		for child in container.get_children():
 			child.remove_walls(past_pos)
@@ -118,7 +118,7 @@ func generate_dungeon_path(length: int, start_pos: Vector3i, prev_dir: Vector3i)
 		return true
 	var curr_pos: Vector3i = start_pos
 	
-	#await get_tree().create_timer(0.5).timeout
+	await get_tree().create_timer(0.0).timeout
 	
 	directions.shuffle()
 	
@@ -134,14 +134,16 @@ func generate_dungeon_path(length: int, start_pos: Vector3i, prev_dir: Vector3i)
 					#grid_map.set_cell_item(curr_pos, 0)
 					if dir == Vector3i.UP:
 						#print("up")
-						if past_pos.has(curr_pos + prev_dir) or !check_inside_boundary(curr_pos + prev_dir) or length == path_length or length == 1:
-							#print("Skipped because no room")
+						if past_pos.has(curr_pos + prev_dir) or !check_inside_boundary(curr_pos + prev_dir) or length == path_length or length == 1 or length == 2:
+							#print("Skipped up because no room")
+							curr_pos -= dir
 							continue
 						curr_pos += prev_dir
 						spawn_object(curr_pos, 3, prev_dir)
 					elif dir == Vector3i.DOWN:
-						if past_pos.has(curr_pos + prev_dir) or !check_inside_boundary(curr_pos + prev_dir) or length == path_length or length == 1:
-							#print("Skipped because no room")
+						if past_pos.has(curr_pos + prev_dir) or !check_inside_boundary(curr_pos + prev_dir) or length == path_length or length == 1 or length == 2:
+							#print("Skipped down because no room")
+							curr_pos -= dir
 							continue
 						curr_pos += prev_dir
 						spawn_object(curr_pos, 4, prev_dir)
@@ -151,8 +153,8 @@ func generate_dungeon_path(length: int, start_pos: Vector3i, prev_dir: Vector3i)
 					#if dir != Vector3i.UP and dir != Vector3i.DOWN:
 					#grid_map.set_cell_item(curr_pos, 2)
 					spawn_object(curr_pos, 2, prev_dir)
-				#var f = await generate_dungeon_path(length - 1, curr_pos, dir)
-				if generate_dungeon_path(length - 1, curr_pos, dir):
+				var f = await generate_dungeon_path(length - 1, curr_pos, dir)
+				if f:
 					return true
 				else:
 					#grid_map.set_cell_item(curr_pos, -1)
