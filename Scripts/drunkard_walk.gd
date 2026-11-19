@@ -53,6 +53,8 @@ var directions: Array = [
 	Vector3i.BACK, Vector3i.DOWN, Vector3i.FORWARD, Vector3i.LEFT, Vector3i.RIGHT, Vector3i.UP
 ]
 
+@export var generate_button: Button
+
 func _ready() -> void:
 	generate_dungeon()
 
@@ -88,6 +90,8 @@ func create_border() -> void:
 		grid_map.set_cell_item(Vector3i(border_size.x, i, border_size.y), 3)
 
 func generate_dungeon() -> void:
+	generate_button.disabled = true
+	
 	create_border()
 	spawn_object(start, 1, Vector3i.ZERO)
 	
@@ -96,6 +100,7 @@ func generate_dungeon() -> void:
 		print("Created Dungeon!")
 		for child in container.get_children():
 			child.remove_walls(past_pos)
+		generate_button.disabled = false
 	else:
 		print("Failed to Create Dungeon!!!")
 	
@@ -268,3 +273,7 @@ func check_inside_boundary(pos: Vector3i) -> bool:
 				return true
 	
 	return false
+
+
+func _on_generate_button_pressed() -> void:
+	generate_dungeon()

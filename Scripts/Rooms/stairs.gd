@@ -1,6 +1,5 @@
 @tool
-extends Node3D
-
+extends room_class
 
 func _ready() -> void:
 	add_to_group("Stairs")
