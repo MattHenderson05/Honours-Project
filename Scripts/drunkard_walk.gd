@@ -15,13 +15,17 @@ extends Node3D
 @export var path_length_label: Label
 @export var path_length_slider: HSlider
 
+@export_subgroup("Camera")
+
+@export var main_camera: Camera3D
+
 var dungeon: Array
 var past_pos: Dictionary [Vector3i, Node3D]
 
-const norm_room = preload("res://Objects/room.tscn")
-const spawn_room = preload("res://Objects/spawn.tscn")
-const end_room = preload("res://Objects/end.tscn")
-const stair_room = preload("res://Objects/stairs.tscn")
+const norm_room = preload("res://Objects/Rooms/room.tscn")
+const spawn_room = preload("res://Objects/Rooms/spawn.tscn")
+const end_room = preload("res://Objects/Rooms/end.tscn")
+const stair_room = preload("res://Objects/Rooms/stairs.tscn")
 
 @onready var container: Node3D = $Container
 
@@ -50,6 +54,12 @@ func set_border_size(value: Vector3i) -> void:
 	border_size_y.value = border_size.y
 	border_size_z.value = border_size.z
 	
+	@warning_ignore("integer_division")
+	main_camera.position.x = border_size.x / 2
+	main_camera.position.y = border_size.y
+	@warning_ignore("integer_division")
+	main_camera.position.z = -border_size.y / 2
+	
 	create_border()
 
 @export var start: Vector3i = Vector3i(5, 5, 5) : set = set_start
@@ -71,6 +81,8 @@ func set_start(value: Vector3i) -> void:
 	start_pos_x.value = start.x
 	start_pos_y.value = start.y
 	start_pos_z.value = start.z
+	
+	create_border()
 
 @export var path_length: int = 90 : set = set_length
 func set_length(value: int) -> void:
@@ -89,6 +101,13 @@ var directions: Array = [
 
 func _ready() -> void:
 	generate_dungeon()
+
+func _input(event: InputEvent) -> void:
+	if event.is_action_pressed("Space") and !generate_button.disabled and past_pos.get(start):
+		if main_camera.current:
+			past_pos.get(start).set_player_camera_state()
+		else:
+			main_camera.make_current()
 
 #Creates a visible border using a grid map
 func create_border() -> void:
@@ -134,6 +153,7 @@ func generate_dungeon() -> void:
 		print("Created Dungeon!")
 		for child in container.get_children():
 			child.remove_walls(past_pos)
+		past_pos.get(start).spawn_player()
 		change_ui_editability(true)
 	else:
 		print("Failed to Create Dungeon!!!")

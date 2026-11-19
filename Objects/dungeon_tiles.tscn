@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://du4eq83xniayt"]
 
-[ext_resource type="PackedScene" uid="uid://cg43voh6pqqo0" path="res://Objects/room.tscn" id="1_s2k12"]
+[ext_resource type="PackedScene" uid="uid://cg43voh6pqqo0" path="res://Objects/Rooms/room.tscn" id="1_s2k12"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_ra2i3"]
 flip_faces = true
