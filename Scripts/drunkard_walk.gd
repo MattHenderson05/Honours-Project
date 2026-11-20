@@ -106,8 +106,10 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("Space") and !generate_button.disabled and past_pos.get(start):
 		if main_camera.current:
 			past_pos.get(start).set_player_camera_state()
+			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 		else:
 			main_camera.make_current()
+			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 
 #Creates a visible border using a grid map
 func create_border() -> void:

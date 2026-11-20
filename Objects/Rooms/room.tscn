@@ -10,7 +10,8 @@ material = SubResource("StandardMaterial3D_ra2i3")
 flip_faces = true
 orientation = 1
 
-[sub_resource type="HeightMapShape3D" id="HeightMapShape3D_ra2i3"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_6f2qh"]
+size = Vector3(1, 0.001, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_g4gaj"]
 cull_mode = 2
@@ -19,12 +20,18 @@ cull_mode = 2
 material = SubResource("StandardMaterial3D_g4gaj")
 orientation = 1
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_fn4fn"]
+size = Vector3(1, 0.001, 1)
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_otjlk"]
 cull_mode = 2
 
 [sub_resource type="QuadMesh" id="QuadMesh_m8fb8"]
 material = SubResource("StandardMaterial3D_otjlk")
 orientation = 0
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_qrbxj"]
+size = Vector3(0.001, 1, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4liu5"]
 cull_mode = 2
@@ -34,18 +41,27 @@ material = SubResource("StandardMaterial3D_4liu5")
 flip_faces = true
 orientation = 0
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_ajuhi"]
+size = Vector3(0.001, 1, 1)
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_a5s0c"]
 cull_mode = 2
 
 [sub_resource type="QuadMesh" id="QuadMesh_6m21n"]
 material = SubResource("StandardMaterial3D_a5s0c")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2qufo"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_jac34"]
+size = Vector3(1, 1, 0.001)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_44jnn"]
 cull_mode = 2
 
 [sub_resource type="QuadMesh" id="QuadMesh_qj8v5"]
-material = SubResource("StandardMaterial3D_2qufo")
+material = SubResource("StandardMaterial3D_44jnn")
 flip_faces = true
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_turc7"]
+size = Vector3(1, 1, 0.001)
 
 [node name="Room" type="Node3D" unique_id=669720818 node_paths=PackedStringArray("walls")]
 script = ExtResource("1_6f2qh")
@@ -55,56 +71,52 @@ walls = [NodePath("Room_Wall1"), NodePath("Room_Wall2"), NodePath("Room_Wall3"),
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.49995404, 1, 0.49854732)
 mesh = SubResource("QuadMesh_kncqe")
 
-[node name="Area3D" type="Area3D" parent="Room_Ceiling" unique_id=344377318]
+[node name="StaticBody3D" type="StaticBody3D" parent="Room_Ceiling" unique_id=2132884944]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Room_Ceiling/Area3D" unique_id=1983177423]
-shape = SubResource("HeightMapShape3D_ra2i3")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Room_Ceiling/StaticBody3D" unique_id=44017770]
+shape = SubResource("BoxShape3D_6f2qh")
 
 [node name="Room_Floor" type="MeshInstance3D" parent="." unique_id=1781818127]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.49995404, 0, 0.49854732)
 mesh = SubResource("QuadMesh_4umi3")
 
-[node name="Area3D" type="Area3D" parent="Room_Floor" unique_id=7042731]
+[node name="StaticBody3D" type="StaticBody3D" parent="Room_Floor" unique_id=1949405972]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Room_Floor/Area3D" unique_id=1401997143]
-shape = SubResource("HeightMapShape3D_ra2i3")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Room_Floor/StaticBody3D" unique_id=107438727]
+shape = SubResource("BoxShape3D_fn4fn")
 
 [node name="Room_Wall1" type="MeshInstance3D" parent="." unique_id=117627264]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.595518e-05, 0.5, 0.49854732)
 mesh = SubResource("QuadMesh_m8fb8")
 
-[node name="Area3D" type="Area3D" parent="Room_Wall1" unique_id=1711655100]
+[node name="StaticBody3D" type="StaticBody3D" parent="Room_Wall1" unique_id=1087403688]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Room_Wall1/Area3D" unique_id=82196784]
-transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
-shape = SubResource("HeightMapShape3D_ra2i3")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Room_Wall1/StaticBody3D" unique_id=2044637443]
+shape = SubResource("BoxShape3D_qrbxj")
 
 [node name="Room_Wall2" type="MeshInstance3D" parent="." unique_id=717375470]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.99995404, 0.5, 0.49854732)
 mesh = SubResource("QuadMesh_pmx8i")
 
-[node name="Area3D" type="Area3D" parent="Room_Wall2" unique_id=672599629]
+[node name="StaticBody3D" type="StaticBody3D" parent="Room_Wall2" unique_id=251869697]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Room_Wall2/Area3D" unique_id=1246665046]
-transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
-shape = SubResource("HeightMapShape3D_ra2i3")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Room_Wall2/StaticBody3D" unique_id=406547516]
+shape = SubResource("BoxShape3D_ajuhi")
 
 [node name="Room_Wall3" type="MeshInstance3D" parent="." unique_id=2013858721]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.49995404, 0.5, -0.0014526844)
 mesh = SubResource("QuadMesh_6m21n")
 
-[node name="Area3D" type="Area3D" parent="Room_Wall3" unique_id=245377836]
+[node name="StaticBody3D" type="StaticBody3D" parent="Room_Wall3" unique_id=341626947]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Room_Wall3/Area3D" unique_id=636412997]
-transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
-shape = SubResource("HeightMapShape3D_ra2i3")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Room_Wall3/StaticBody3D" unique_id=214172713]
+shape = SubResource("BoxShape3D_jac34")
 
 [node name="Room_Wall4" type="MeshInstance3D" parent="." unique_id=1297344601]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.49995404, 0.5, 0.9985473)
 mesh = SubResource("QuadMesh_qj8v5")
 
-[node name="Area3D" type="Area3D" parent="Room_Wall4" unique_id=2004634067]
+[node name="StaticBody3D" type="StaticBody3D" parent="Room_Wall4" unique_id=1843186596]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Room_Wall4/Area3D" unique_id=2016309103]
-transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
-shape = SubResource("HeightMapShape3D_ra2i3")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Room_Wall4/StaticBody3D" unique_id=1228218227]
+shape = SubResource("BoxShape3D_turc7")

@@ -2,17 +2,16 @@
 
 [ext_resource type="Script" uid="uid://b2bs01srta5vn" path="res://Scripts/player.gd" id="1_y0qk3"]
 
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_ra2i3"]
-
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ra2i3"]
+height = 1.5
 
-[node name="Player" type="Node3D" unique_id=1547016062 node_paths=PackedStringArray("player_camera")]
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_ra2i3"]
+height = 1.5
+
+[node name="Player" type="Node3D" unique_id=1547016062 node_paths=PackedStringArray("player_camera", "character_body")]
 script = ExtResource("1_y0qk3")
-player_camera = NodePath("Camera3D")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1064813130]
-transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
-mesh = SubResource("CapsuleMesh_ra2i3")
+player_camera = NodePath("CharacterBody3D/Camera3D")
+character_body = NodePath("CharacterBody3D")
 
 [node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=285136881]
 slide_on_ceiling = false
@@ -21,4 +20,8 @@ slide_on_ceiling = false
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
 shape = SubResource("CapsuleShape3D_ra2i3")
 
-[node name="Camera3D" type="Camera3D" parent="." unique_id=1664316223]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CharacterBody3D" unique_id=1064813130]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
+mesh = SubResource("CapsuleMesh_ra2i3")
+
+[node name="Camera3D" type="Camera3D" parent="CharacterBody3D" unique_id=1664316223]

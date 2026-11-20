@@ -11,3 +11,4 @@ func remove_walls(past_pos: Dictionary[Vector3i, Node3D]) -> void:
 	for i in 4:
 		if past_pos.has(Vector3i(position.x + directions[i].x, position.y + directions[i].y, position.z + directions[i].z)):
 			walls[i].visible = false
+			walls[i].get_child(0).get_child(0).disabled = true
