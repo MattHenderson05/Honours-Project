@@ -48,7 +48,8 @@ func set_border_size(value: Vector3i) -> void:
 	start_pos_x.max_value = border_size.x - 1
 	start_pos_y.max_value = border_size.y - 1
 	start_pos_z.max_value = border_size.z - 1
-	path_length_slider.max_value = border_size.x * border_size.y * border_size.z - 2
+	@warning_ignore("integer_division")
+	path_length_slider.max_value = (border_size.x * border_size.y * border_size.z) / 2
 	
 	border_size_x.value = border_size.x
 	border_size_y.value = border_size.y
@@ -89,8 +90,10 @@ func set_length(value: int) -> void:
 	path_length = value
 	if path_length < 1:
 		path_length = 1
-	if path_length > border_size.x * border_size.y * border_size.z - 2:
-		path_length = border_size.x * border_size.y * border_size.z - 2
+	@warning_ignore("integer_division")
+	if path_length > (border_size.x * border_size.y * border_size.z) / 2:
+		@warning_ignore("integer_division")
+		path_length = (border_size.x * border_size.y * border_size.z) / 2
 	
 	path_length_label.text = "Path Length: " + str(path_length)
 	path_length_slider.value = path_length

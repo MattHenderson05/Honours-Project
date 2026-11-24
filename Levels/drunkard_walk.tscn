@@ -126,12 +126,12 @@ value = 5.0
 
 [node name="PathLengthLabel" type="Label" parent="UI/VBoxContainer" unique_id=431202498]
 layout_mode = 2
-text = "PathLength: 90"
+text = "Path Length: 90"
 
 [node name="PathLengthSlider" type="HSlider" parent="UI/VBoxContainer" unique_id=194797981]
 layout_mode = 2
 min_value = 1.0
-max_value = 998.0
+max_value = 500.0
 value = 90.0
 
 [connection signal="pressed" from="UI/VBoxContainer/GenerateButton" to="." method="_on_generate_button_pressed"]

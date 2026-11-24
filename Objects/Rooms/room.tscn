@@ -68,7 +68,7 @@ script = ExtResource("1_6f2qh")
 walls = [NodePath("Room_Wall1"), NodePath("Room_Wall2"), NodePath("Room_Wall3"), NodePath("Room_Wall4")]
 
 [node name="Room_Ceiling" type="MeshInstance3D" parent="." unique_id=1361194101]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.49995404, 1, 0.49854732)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.99, 0.499)
 mesh = SubResource("QuadMesh_kncqe")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="Room_Ceiling" unique_id=2132884944]
@@ -77,7 +77,7 @@ mesh = SubResource("QuadMesh_kncqe")
 shape = SubResource("BoxShape3D_6f2qh")
 
 [node name="Room_Floor" type="MeshInstance3D" parent="." unique_id=1781818127]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.49995404, 0, 0.49854732)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.01, 0.499)
 mesh = SubResource("QuadMesh_4umi3")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="Room_Floor" unique_id=1949405972]
