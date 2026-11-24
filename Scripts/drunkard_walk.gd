@@ -19,7 +19,6 @@ extends Node3D
 
 @export var main_camera: Camera3D
 
-var dungeon: Array
 var past_pos: Dictionary [Vector3i, Node3D]
 
 const norm_room = preload("res://Objects/Rooms/room.tscn")
