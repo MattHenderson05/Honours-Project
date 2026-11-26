@@ -9,8 +9,10 @@ const norm_room = preload("res://Objects/Rooms/room.tscn")
 const spawn_room = preload("res://Objects/Rooms/spawn.tscn")
 const end_room = preload("res://Objects/Rooms/end.tscn")
 const stair_room = preload("res://Objects/Rooms/stairs.tscn")
+const door_room = preload("res://Objects/Rooms/door.tscn")
 
 var past_pos: Dictionary [Vector3i, Node3D]
+var room_object_pos: Array[PackedVector3Array]
 var room_pos: PackedVector3Array
 var room_points: PackedInt32Array
 
@@ -87,6 +89,8 @@ func create_border() -> void:
 	grid_map.clear()
 	past_pos.clear()
 	room_pos.clear()
+	room_object_pos.clear()
+	room_points.clear()
 	
 	for child in container.get_children():
 		child.queue_free()
@@ -128,8 +132,10 @@ func generate_dungeon() -> void:
 	
 	calculate_mst()
 	
-	#for child in container.get_children():
-		#child.remove_walls(past_pos)
+	spawn_hallways()
+	
+	for child in container.get_children():
+		child.remove_walls(past_pos)
 
 func spawn_rooms(room_num: int) -> void:
 	var height: int = randi_range(min_room_height_size, max_room_height_size)
@@ -159,6 +165,8 @@ func spawn_rooms(room_num: int) -> void:
 			if break_loop:
 				break
 	
+	var pos: PackedVector3Array
+	
 	for h in height:
 		for w in width:
 			for b in breadth:
@@ -168,6 +176,10 @@ func spawn_rooms(room_num: int) -> void:
 					spawn_object(Vector3i(start_pos.x + w, start_pos.y + h, start_pos.z + b), 2)
 				else:
 					spawn_object(Vector3i(start_pos.x + w, start_pos.y + h, start_pos.z + b), 0)
+				
+				pos.append(Vector3i(start_pos.x + w, start_pos.y + h, start_pos.z + b))
+	
+	room_object_pos.append(pos)
 	
 	@warning_ignore("integer_division")
 	var avg_x : int = start_pos.x + (width / 2)
@@ -188,6 +200,11 @@ func spawn_object(pos: Vector3i, room: int) -> void:
 			new_obj = spawn_room.instantiate()
 		2:
 			new_obj = end_room.instantiate()
+		3:
+			var old_obj = past_pos.get(pos)
+			old_obj.queue_free()
+			
+			new_obj = door_room.instantiate()
 	
 	container.add_child(new_obj)
 	
@@ -256,6 +273,14 @@ func calculate_mst() -> void:
 		mst_connections.connect_points(curr_point, min_point)
 		extra_connections.disconnect_points(curr_point, min_point)
 	
+	for extra_points in extra_connections.get_point_ids():
+		for extra_conn in extra_connections.get_point_connections(extra_points):
+			if extra_conn > extra_points:
+				var conn_chance: float = randf_range(0, 1)
+				if conn_chance < 0.2:
+					mst_connections.connect_points(extra_points, extra_conn)
+	
+	# Removes the old grey connections and replaces them with green ones
 	for child in line_container.get_children():
 		child.queue_free()
 	
@@ -268,9 +293,43 @@ func calculate_mst() -> void:
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	
 	imesh.surface_begin(Mesh.PRIMITIVE_LINES, mat)
-	for i in range(0, visited_room_points.size() - 1):
-		imesh.surface_add_vertex(room_pos[i])
-		imesh.surface_add_vertex(room_pos[i + 1])
+	#for i in range(0, visited_room_points.size() - 1):
+		#imesh.surface_add_vertex(room_pos[i])
+		#imesh.surface_add_vertex(room_pos[i + 1])
+	
+	for mst_id in mst_connections.get_point_ids():
+		for mst_conn in mst_connections.get_point_connections(mst_id):
+			if mst_conn > mst_id:
+				imesh.surface_add_vertex(room_pos[mst_id])
+				imesh.surface_add_vertex(room_pos[mst_conn])
 	imesh.surface_end()
 	
 	line_container.add_child(mi)
+
+func spawn_hallways() -> void:
+	var hallways : Array[PackedVector3Array] = []
+	
+	for mst_id in mst_connections.get_point_ids():
+		for mst_conn in mst_connections.get_point_connections(mst_id):
+			if mst_conn > mst_id:
+				var room_from : PackedVector3Array = room_object_pos[mst_id]
+				var room_to : PackedVector3Array = room_object_pos[mst_conn]
+				var closest_object_from : Vector3 = room_from[0]
+				var closest_object_to : Vector3 = room_to[0]
+				
+				for from in room_from:
+					if from.distance_squared_to(room_pos[mst_conn]) < closest_object_from.distance_squared_to(room_pos[mst_conn]):
+						closest_object_from = from
+					
+				for to in room_to:
+					if to.distance_squared_to(room_pos[mst_id]) < closest_object_to.distance_squared_to(room_pos[mst_id]):
+						closest_object_to = to
+					
+				var hallway : PackedVector3Array = [closest_object_from, closest_object_to]
+				hallways.append(hallway)
+				past_pos.get(closest_object_from).add_to_group("Door")
+				past_pos.get(closest_object_to).add_to_group("Door")
+				spawn_object(closest_object_from, 3)
+				spawn_object(closest_object_to, 3)
+				print(mst_id)
+				print(mst_conn)

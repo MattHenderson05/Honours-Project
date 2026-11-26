@@ -1,0 +1,128 @@
+[gd_scene format=3 uid="uid://bhnb1bj7xu3o"]
+
+[ext_resource type="Script" uid="uid://dbbniksnoe2d6" path="res://Scripts/Rooms/door.gd" id="1_teryo"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_desu7"]
+cull_mode = 2
+albedo_color = Color(3.7541986e-06, 0.6595855, 0.5194274, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_teryo"]
+material = SubResource("StandardMaterial3D_desu7")
+flip_faces = true
+orientation = 1
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_d458c"]
+size = Vector3(1, 0.001, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_khon6"]
+cull_mode = 2
+albedo_color = Color(0, 0.65882355, 0.5176471, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_ll8r7"]
+material = SubResource("StandardMaterial3D_khon6")
+orientation = 1
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_xo6bn"]
+size = Vector3(1, 0.001, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_y1pl0"]
+cull_mode = 2
+albedo_color = Color(0, 0.65882355, 0.5176471, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_wn38k"]
+material = SubResource("StandardMaterial3D_y1pl0")
+orientation = 0
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ltrk7"]
+size = Vector3(0.001, 1, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5yfqj"]
+cull_mode = 2
+albedo_color = Color(0, 0.65882355, 0.5176471, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_ivvnr"]
+material = SubResource("StandardMaterial3D_5yfqj")
+flip_faces = true
+orientation = 0
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ew8gv"]
+size = Vector3(0.001, 1, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1wdld"]
+cull_mode = 2
+albedo_color = Color(0, 0.65882355, 0.5176471, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_xt5xj"]
+material = SubResource("StandardMaterial3D_1wdld")
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_gyqfp"]
+size = Vector3(1, 1, 0.001)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gwqmh"]
+cull_mode = 2
+albedo_color = Color(0, 0.65882355, 0.5176471, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_xh0j4"]
+material = SubResource("StandardMaterial3D_gwqmh")
+flip_faces = true
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wn215"]
+size = Vector3(1, 1, 0.001)
+
+[node name="Door" type="Node3D" unique_id=345390434 node_paths=PackedStringArray("walls")]
+script = ExtResource("1_teryo")
+walls = [NodePath("Room_Wall1"), NodePath("Room_Wall2"), NodePath("Room_Wall3"), NodePath("Room_Wall4")]
+
+[node name="Room_Ceiling" type="MeshInstance3D" parent="." unique_id=570106031]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.99, 0.499)
+mesh = SubResource("QuadMesh_teryo")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Room_Ceiling" unique_id=1261637678]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Room_Ceiling/StaticBody3D" unique_id=1887827314]
+shape = SubResource("BoxShape3D_d458c")
+
+[node name="Room_Floor" type="MeshInstance3D" parent="." unique_id=1999643196]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.01, 0.499)
+mesh = SubResource("QuadMesh_ll8r7")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Room_Floor" unique_id=1657423208]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Room_Floor/StaticBody3D" unique_id=1035292627]
+shape = SubResource("BoxShape3D_xo6bn")
+
+[node name="Room_Wall1" type="MeshInstance3D" parent="." unique_id=1458429715]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.595518e-05, 0.5, 0.49854732)
+mesh = SubResource("QuadMesh_wn38k")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Room_Wall1" unique_id=1948988987]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Room_Wall1/StaticBody3D" unique_id=2120960442]
+shape = SubResource("BoxShape3D_ltrk7")
+
+[node name="Room_Wall2" type="MeshInstance3D" parent="." unique_id=2094778847]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.99995404, 0.5, 0.49854732)
+mesh = SubResource("QuadMesh_ivvnr")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Room_Wall2" unique_id=834985629]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Room_Wall2/StaticBody3D" unique_id=590996810]
+shape = SubResource("BoxShape3D_ew8gv")
+
+[node name="Room_Wall3" type="MeshInstance3D" parent="." unique_id=1913104670]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.49995404, 0.5, -0.0014526844)
+mesh = SubResource("QuadMesh_xt5xj")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Room_Wall3" unique_id=1938746048]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Room_Wall3/StaticBody3D" unique_id=1944315033]
+shape = SubResource("BoxShape3D_gyqfp")
+
+[node name="Room_Wall4" type="MeshInstance3D" parent="." unique_id=1955489295]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.49995404, 0.5, 0.9985473)
+mesh = SubResource("QuadMesh_xh0j4")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Room_Wall4" unique_id=498584728]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Room_Wall4/StaticBody3D" unique_id=1310693467]
+shape = SubResource("BoxShape3D_wn215")
