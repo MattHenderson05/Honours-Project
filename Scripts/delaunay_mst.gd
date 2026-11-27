@@ -10,11 +10,13 @@ const spawn_room = preload("res://Objects/Rooms/spawn.tscn")
 const end_room = preload("res://Objects/Rooms/end.tscn")
 const stair_room = preload("res://Objects/Rooms/stairs.tscn")
 const door_room = preload("res://Objects/Rooms/door.tscn")
+const hallway_room = preload("res://Objects/Rooms/hall_way.tscn")
 
 var past_pos: Dictionary [Vector3i, Node3D]
 var room_object_pos: Array[PackedVector3Array]
 var room_pos: PackedVector3Array
 var room_points: PackedInt32Array
+var stairway_points: Dictionary [Vector3i, int] # o up - 1 down
 
 var extra_connections: AStar3D
 var mst_connections: AStar3D
@@ -91,6 +93,7 @@ func create_border() -> void:
 	room_pos.clear()
 	room_object_pos.clear()
 	room_points.clear()
+	stairway_points.clear()
 	
 	for child in container.get_children():
 		child.queue_free()
@@ -128,14 +131,17 @@ func generate_dungeon() -> void:
 	for i in num_of_rooms:
 		spawn_rooms(i)
 	
+	for i in range(start.y - 5, start.y + 5):
+		spawn_stairs(i)
+	
 	create_delaunay_lines()
 	
 	calculate_mst()
 	
 	spawn_hallways()
 	
-	for child in container.get_children():
-		child.remove_walls(past_pos)
+	#for child in container.get_children():
+		#child.remove_walls(past_pos)
 
 func spawn_rooms(room_num: int) -> void:
 	var height: int = randi_range(min_room_height_size, max_room_height_size)
@@ -153,8 +159,11 @@ func spawn_rooms(room_num: int) -> void:
 			var break_loop = true
 			
 			start_pos.x = randi_range(width, border_size.x) - width
-			start_pos.y = randi_range(height, border_size.y) - height
+			start_pos.y = randi_range(start.y - 5, start.y + 5)
 			start_pos.z = randi_range(breadth, border_size.z) - breadth
+			
+			if start_pos.y < 0:
+				start_pos.y = 0
 			
 			for h in range(-max_dist_between_rooms, height + max_dist_between_rooms):
 				for w in range(-max_dist_between_rooms, width + max_dist_between_rooms):
@@ -166,6 +175,7 @@ func spawn_rooms(room_num: int) -> void:
 				break
 	
 	var pos: PackedVector3Array
+	var first_level: bool = false
 	
 	for h in height:
 		for w in width:
@@ -177,9 +187,12 @@ func spawn_rooms(room_num: int) -> void:
 				else:
 					spawn_object(Vector3i(start_pos.x + w, start_pos.y + h, start_pos.z + b), 0)
 				
-				pos.append(Vector3i(start_pos.x + w, start_pos.y + h, start_pos.z + b))
+				if !first_level:
+					pos.append(Vector3i(start_pos.x + w, start_pos.y + h, start_pos.z + b))
+		first_level = true
 	
 	room_object_pos.append(pos)
+	first_level = false
 	
 	@warning_ignore("integer_division")
 	var avg_x : int = start_pos.x + (width / 2)
@@ -189,6 +202,31 @@ func spawn_rooms(room_num: int) -> void:
 	var avg_z: int = start_pos.z + (breadth / 2)
 	
 	room_pos.append(Vector3i(avg_x, avg_y, avg_z))
+
+func spawn_stairs(height: int) -> void:
+	var start_pos: Vector3i
+	for i in max_room_loop:
+		if i == max_room_loop - 1:
+			return
+		
+		var break_loop = true
+		
+		start_pos.x = randi_range(2, border_size.x - 3)
+		start_pos.y = height
+		start_pos.z = randi_range(2, border_size.z - 3)
+		
+		for h in range(-max_dist_between_rooms, height + max_dist_between_rooms):
+			for w in range(-max_dist_between_rooms, start_pos.x + max_dist_between_rooms):
+					for b in range(-max_dist_between_rooms, start_pos.z + max_dist_between_rooms):
+						if past_pos.has(Vector3i(start_pos.x + w, start_pos.y + h, start_pos.z + b)):
+							break_loop = false
+		
+		if break_loop:
+			break
+	
+	
+	var dir = randi_range(0, 3)
+	spawn_stair(start_pos, dir, height)
 
 func spawn_object(pos: Vector3i, room: int) -> void:
 	var new_obj: Node3D
@@ -205,12 +243,72 @@ func spawn_object(pos: Vector3i, room: int) -> void:
 			old_obj.queue_free()
 			
 			new_obj = door_room.instantiate()
+		4:
+			new_obj = hallway_room.instantiate()
 	
 	container.add_child(new_obj)
 	
 	new_obj.global_position = pos
 	
 	past_pos.set(pos, new_obj)
+
+func spawn_stair(pos: Vector3i, dir: int, height: int) -> void:
+	var new_obj_infront: Node3D
+	var new_obj_behind: Node3D
+	var stair_obj: Node3D
+	
+	stair_obj = stair_room.instantiate()
+	new_obj_infront = door_room.instantiate()
+	new_obj_behind = door_room.instantiate()
+	
+	container.add_child(stair_obj)
+	container.add_child(new_obj_infront)
+	container.add_child(new_obj_behind)
+	
+	match dir:
+		0:
+			stair_obj.global_position = pos - Vector3i.LEFT
+			new_obj_infront.global_position = pos
+			new_obj_behind.global_position = pos + Vector3i.UP - Vector3i.LEFT - Vector3i.LEFT
+			
+			past_pos.set(pos - Vector3i.LEFT, stair_obj)
+			past_pos.set(pos - Vector3i.LEFT + Vector3i.UP, stair_obj)
+			
+			stairway_points.set(pos, 0)
+			stairway_points.set(pos + Vector3i.UP - Vector3i.LEFT - Vector3i.LEFT, 1)
+		1:
+			stair_obj.global_position = pos
+			stair_obj.rotation.y += deg_to_rad(90)
+			new_obj_infront.global_position = pos
+			new_obj_behind.global_position = pos + Vector3i.UP - Vector3i.BACK - Vector3i.BACK
+			
+			past_pos.set(pos - Vector3i.BACK, stair_obj)
+			past_pos.set(pos - Vector3i.BACK + Vector3i.UP, stair_obj)
+			
+			stairway_points.set(pos, 0)
+			stairway_points.set(pos + Vector3i.UP - Vector3i.BACK - Vector3i.BACK, 1)
+		2:
+			stair_obj.global_position = pos - Vector3i.FORWARD
+			stair_obj.rotation.y += deg_to_rad(180)
+			new_obj_infront.global_position = pos
+			new_obj_behind.global_position = pos + Vector3i.UP - Vector3i.RIGHT - Vector3i.RIGHT
+			
+			past_pos.set(pos - Vector3i.RIGHT, stair_obj)
+			past_pos.set(pos - Vector3i.RIGHT + Vector3i.UP, stair_obj)
+			
+			stairway_points.set(pos, 0)
+			stairway_points.set(pos + Vector3i.UP - Vector3i.RIGHT - Vector3i.RIGHT, 1)
+		3:
+			stair_obj.global_position = pos - Vector3i.FORWARD - Vector3i.LEFT
+			stair_obj.rotation.y += deg_to_rad(270)
+			new_obj_infront.global_position = pos
+			new_obj_behind.global_position = pos + Vector3i.UP - Vector3i.FORWARD - Vector3i.FORWARD
+			
+			past_pos.set(pos - Vector3i.FORWARD, stair_obj)
+			past_pos.set(pos - Vector3i.FORWARD + Vector3i.UP, stair_obj)
+			
+			stairway_points.set(pos, 0)
+			stairway_points.set(pos + Vector3i.UP - Vector3i.FORWARD - Vector3i.FORWARD, 1)
 
 func create_delaunay_lines() -> void:
 	room_points = Geometry3D.tetrahedralize_delaunay(room_pos)
@@ -272,12 +370,13 @@ func calculate_mst() -> void:
 		visited_room_points.append(min_point)
 		mst_connections.connect_points(curr_point, min_point)
 		extra_connections.disconnect_points(curr_point, min_point)
+		min_dist = INF
 	
 	for extra_points in extra_connections.get_point_ids():
 		for extra_conn in extra_connections.get_point_connections(extra_points):
 			if extra_conn > extra_points:
 				var conn_chance: float = randf_range(0, 1)
-				if conn_chance < 0.2:
+				if conn_chance < 0.1:
 					mst_connections.connect_points(extra_points, extra_conn)
 	
 	# Removes the old grey connections and replaces them with green ones
@@ -293,9 +392,6 @@ func calculate_mst() -> void:
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	
 	imesh.surface_begin(Mesh.PRIMITIVE_LINES, mat)
-	#for i in range(0, visited_room_points.size() - 1):
-		#imesh.surface_add_vertex(room_pos[i])
-		#imesh.surface_add_vertex(room_pos[i + 1])
 	
 	for mst_id in mst_connections.get_point_ids():
 		for mst_conn in mst_connections.get_point_connections(mst_id):
@@ -331,5 +427,62 @@ func spawn_hallways() -> void:
 				past_pos.get(closest_object_to).add_to_group("Door")
 				spawn_object(closest_object_from, 3)
 				spawn_object(closest_object_to, 3)
-				print(mst_id)
-				print(mst_conn)
+	
+	var a_star: AStar3D = AStar3D.new()
+	var room_ids: Dictionary [Vector3i, int]
+	var break_loop: bool = false
+	
+	for i in range(0, hallways.size()):
+		var id_1: int = a_star.get_available_point_id()
+		a_star.add_point(id_1, hallways[i][0])
+		room_ids.set(Vector3i(hallways[i][0]), id_1)
+		
+		var id_2: int = a_star.get_available_point_id()
+		a_star.add_point(id_2, hallways[i][1])
+		room_ids.set(Vector3i(hallways[i][1]), id_2)
+	
+	for height in border_size.y:
+		for width in border_size.x:
+			for breadth in border_size.z:
+				for halls in hallways:
+					if halls.has(Vector3(width, height, breadth)):
+						break_loop = true
+						continue
+				if break_loop:
+					break_loop = false
+					continue
+				var id: int = a_star.get_available_point_id()
+				a_star.add_point(id, Vector3(width, height, breadth))
+				room_ids.set(Vector3(width, height, breadth), id)
+				if past_pos.has(Vector3(width, height, breadth)):
+					a_star.set_point_disabled(id, true)
+	
+	var dir_offset: Array[Vector3i] = [Vector3i.RIGHT, Vector3i.BACK, Vector3i.LEFT, Vector3i.FORWARD, Vector3i.UP, Vector3i.DOWN]
+	
+	for height in border_size.y:
+		for width in border_size.x:
+			for breadth in border_size.z:
+				for offset in dir_offset:
+					var next_room: Vector3i = Vector3i(width, height, breadth) + offset
+					if room_ids.has(next_room) and room_ids.has(Vector3i(width, height, breadth)):
+						if !a_star.is_point_disabled(room_ids[Vector3i(width, height, breadth)]) and !a_star.is_point_disabled(room_ids[next_room]):
+							a_star.connect_points(room_ids[Vector3i(width, height, breadth)], room_ids[next_room])
+	
+	for i in range(0, hallways.size() * 2, 2):
+		var hall_pos : PackedVector3Array = a_star.get_point_path(i, i + 1, true)
+		if hall_pos[0].y == hall_pos[hall_pos.size() - 1].y:
+			for f in range(1, hall_pos.size() - 1):
+				spawn_object(hall_pos[f], 4)
+		else:
+			var min_height: int = hall_pos[0].y
+			var max_height: int = hall_pos[hall_pos.size() - 1].y
+			var going_up: bool
+			
+			if min_height - max_height < 0:
+				going_up = true
+			else:
+				going_up = false
+			
+			for height in range(min_height, max_height):
+				pass
+			
